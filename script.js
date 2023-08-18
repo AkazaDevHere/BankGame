@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const miniFrameDiv = document.getElementById('MiniFrame');
     const getMoneyButton = document.getElementById('GetMoneyButton');
     const countdown = document.getElementById('timer');
     const moneyAmount = document.getElementById('money');
@@ -9,10 +10,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeShopButton = document.getElementById('CloseButton');
     const carCost = document.getElementById('CarCost');
     const inventoryButton = document.getElementById('InventoryButton');
+    const sellCarButton = document.getElementById('SellCarButton');
   
-    // Load saved data from localStorage
     let currentMoney = parseInt(localStorage.getItem('currentMoney')) || 0;
     let carsInventory = JSON.parse(localStorage.getItem('carsInventory')) || {};
+    let data1Value = localStorage.getItem('Data1') || '';
   
     updateUI();
   
@@ -89,6 +91,15 @@ document.addEventListener('DOMContentLoaded', () => {
       displayInventory();
     });
   
+    sellCarButton.addEventListener('click', () => {
+      const selectedCar = document.querySelector('input[name="car"]:checked').value;
+      if (selectedCar) {
+        sellCar(selectedCar);
+      } else {
+        alert('Please select a car from your inventory.');
+      }
+    });
+  
     closeShopButton.addEventListener('click', () => {
       shopContent.style.display = 'none';
     });
@@ -117,12 +128,38 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   
+    function sellCar(car) {
+      if (carsInventory[car] > 0) {
+        const sellingPrice = Math.floor(Math.random() * 2000) + 1;
+        currentMoney += sellingPrice;
+        moneyAmount.textContent = currentMoney;
+  
+        carsInventory[car]--;
+        if (carsInventory[car] === 0) {
+          delete carsInventory[car];
+        }
+  
+        updateInventoryDisplay();
+        updateUI();
+        alert(`You sold your ${car} for ${sellingPrice} money.`);
+      } else {
+        alert("You don't own this car to sell.");
+      }
+    }
+  
     // Update UI elements based on saved data
     function updateUI() {
       moneyAmount.textContent = currentMoney;
       updateInventoryDisplay();
       localStorage.setItem('currentMoney', currentMoney);
       localStorage.setItem('carsInventory', JSON.stringify(carsInventory));
+      localStorage.setItem('Data2', data1Value);
+    }
+  
+    // Check if the user is logged in
+    const savedUsername = localStorage.getItem('username');
+    if (savedUsername) {
+      miniFrameDiv.style.display = 'block';
     }
   });
   
